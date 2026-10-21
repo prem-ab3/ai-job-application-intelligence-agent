@@ -6,10 +6,12 @@ import SkillsList from './components/SkillsList';
 import SuggestionsCard from './components/SuggestionsCard';
 import ErrorAlert from './components/ErrorAlert';
 import LoadingIndicator from './components/LoadingIndicator';
+import JobDiscovery from './components/JobDiscovery';
 import { analyzeApplication } from './services/api';
 import './App.css';
 
 export default function App() {
+  const [activeTab, setActiveTab] = useState('match');
   const [resumeText, setResumeText] = useState('');
   const [jobDescription, setJobDescription] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -41,27 +43,61 @@ export default function App() {
     <div className="app-container">
       <Header />
 
-      <ErrorAlert message={error} onClose={() => setError(null)} />
+      <nav className="tab-navigation" aria-label="Main Navigation">
+        <button
+          type="button"
+          className={`tab-btn ${activeTab === 'match' ? 'active' : ''}`}
+          onClick={() => setActiveTab('match')}
+        >
+          🎯 Analyze Match
+        </button>
+        <button
+          type="button"
+          className={`tab-btn ${activeTab === 'discover' ? 'active' : ''}`}
+          onClick={() => setActiveTab('discover')}
+        >
+          🔍 Discover Jobs
+        </button>
+      </nav>
 
-      <InputForm
-        resumeText={resumeText}
-        setResumeText={setResumeText}
-        jobDescription={jobDescription}
-        setJobDescription={setJobDescription}
-        onSubmit={handleAnalyze}
-        onReset={handleReset}
-        isLoading={isLoading}
-      />
+      <div
+        id="match-tab-panel"
+        role="tabpanel"
+        className="tab-panel"
+        style={{ display: activeTab === 'match' ? 'block' : 'none' }}
+      >
+        <ErrorAlert message={error} onClose={() => setError(null)} />
 
-      {isLoading && <LoadingIndicator />}
+        <InputForm
+          resumeText={resumeText}
+          setResumeText={setResumeText}
+          jobDescription={jobDescription}
+          setJobDescription={setJobDescription}
+          onSubmit={handleAnalyze}
+          onReset={handleReset}
+          isLoading={isLoading}
+          onError={setError}
+        />
 
-      {analysis && !isLoading && (
-        <main className="results-container">
-          <ScoreCard analysis={analysis} />
-          <SkillsList skills={analysis.skills} />
-          <SuggestionsCard suggestions={analysis.suggestions} />
-        </main>
-      )}
+        {isLoading && <LoadingIndicator />}
+
+        {analysis && !isLoading && (
+          <main className="results-container">
+            <ScoreCard analysis={analysis} />
+            <SkillsList skills={analysis.skills} />
+            <SuggestionsCard suggestions={analysis.suggestions} />
+          </main>
+        )}
+      </div>
+
+      <div
+        id="discover-tab-panel"
+        role="tabpanel"
+        className="tab-panel"
+        style={{ display: activeTab === 'discover' ? 'block' : 'none' }}
+      >
+        <JobDiscovery resumeText={resumeText} setResumeText={setResumeText} />
+      </div>
     </div>
   );
 }

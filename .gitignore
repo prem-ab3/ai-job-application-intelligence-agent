@@ -1,5 +1,8 @@
+
 # Environment secrets
 .env
+.env.*
+!.env.example
 *.env
 
 # Python
@@ -8,6 +11,8 @@ __pycache__/
 .venv/
 venv/
 .pytest_cache/
+.coverage
+htmlcov/
 
 # Node
 node_modules/

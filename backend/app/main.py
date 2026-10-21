@@ -1,4 +1,5 @@
 from typing import Optional
+import logging
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -6,12 +7,20 @@ from google import genai
 
 from app.config import settings
 from app.database import Base, engine
-from app.routers import analysis, health
+from app.routers import analysis, health, jobs, resumes
+from app.agent.prompts import SYSTEM_PROMPT
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Auto-create tables on startup if they do not already exist in Neon DB
-    Base.metadata.create_all(bind=engine)
+    try:
+        Base.metadata.create_all(bind=engine)
+        logger.info("Database schema initialized successfully.")
+    except Exception as exc:
+        logger.warning("Could not auto-create tables on startup (DB offline/DNS issue): %s", exc)
     yield
 
 app = FastAPI(
@@ -37,6 +46,8 @@ app.add_middleware(
 # Include routers
 app.include_router(health.router)
 app.include_router(analysis.router)
+app.include_router(resumes.router)
+app.include_router(jobs.router)
 
 @app.get("/")
 def root(question: Optional[str] = None):
@@ -44,11 +55,6 @@ def root(question: Optional[str] = None):
     Root endpoint: If a question is provided (?question=...), it queries Gemini and returns the answer.
     Otherwise, returns API status and usage information.
     """
-    SYSTEM_PROMPT = """
-You are an expert in Python. If the user asks a question strictly about Python (syntax, libraries, debugging, best practices, etc.), answer it clearly and concisely.
-If the question is NOT about Python (e.g., general knowledge, other programming languages, unrelated topics), respond with: "I am a Python expert. Please ask a Python-related question." Do not answer questions outside your domain of expertise. Do not apologize excessively; just restate your focus on Python.
-"""
-
     if not question:
         return {
             "message": "AI Job Application Intelligence Agent API is running",
@@ -64,6 +70,8 @@ If the question is NOT about Python (e.g., general knowledge, other programming 
             detail="GEMINI_API_KEY is not configured in backend/.env"
         )
 
+    logger.info("Incoming question: %s", question)
+
     try:
         client = genai.Client(api_key=settings.GEMINI_API_KEY)
         response = client.interactions.create(
@@ -72,6 +80,7 @@ If the question is NOT about Python (e.g., general knowledge, other programming 
             system_instruction=SYSTEM_PROMPT,
         )
         answer = getattr(response, "output_text", None) or "No text response returned."
+        logger.info("GEMINI ANSWER: %s", answer)
         return {
             "question": question,
             "answer": answer,
