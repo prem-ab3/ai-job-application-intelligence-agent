@@ -10,6 +10,7 @@ class Settings(BaseSettings):
     ADZUNA_APP_ID: str = ""
     ADZUNA_APP_KEY: str = ""
     ADZUNA_COUNTRY: str = "in"
+    ALLOWED_ORIGINS: str = "*"
 
     model_config = SettingsConfigDict(
         env_file=(BACKEND_DIR / ".env", ".env"),

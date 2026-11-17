@@ -30,14 +30,27 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# Basic CORS configuration for local frontend development
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=[
+def get_allowed_origins() -> list[str]:
+    """Parse ALLOWED_ORIGINS setting into a list of allowed origins."""
+    raw = (settings.ALLOWED_ORIGINS or "").strip()
+    if not raw or raw == "*":
+        return ["*"]
+    origins = [orig.strip().rstrip("/") for orig in raw.split(",") if orig.strip()]
+    for local in [
         "http://localhost:5173",
         "http://127.0.0.1:5173",
         "http://localhost:3000",
-    ],
+        "http://127.0.0.1:3000",
+    ]:
+        if local not in origins:
+            origins.append(local)
+    return origins
+
+
+# CORS configuration supporting deployed frontends and local development
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=get_allowed_origins(),
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
