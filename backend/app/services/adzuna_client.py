@@ -37,38 +37,128 @@ def clean_html(text: Optional[str]) -> str:
 
 
 HEALTHCARE_REGEX = re.compile(
-    r"\b(orthopedic|orthopaedics|surgeon|doctor|physician|nurse|nursing|dentist|dental|clinic|clinical|hospital|radiology|pharmacist|pathology|cardiologist|pediatrician|consultant\s+orthopedics)\b",
+    r"\b(orthopedic|orthopaedics|surgeon|doctor|physician|nurse|nursing|dentist|dental|clinic|clinical|hospital|"
+    r"radiology|pharmacist|pharmacy|pathology|cardiologist|pediatrician|consultant\s+orthopedics|medical\s+officer|"
+    r"healthcare|therapist|optometrist|veterinarian)\b",
     re.IGNORECASE,
 )
 
 LOGISTICS_REGEX = re.compile(
-    r"\b(inventory\s+manager|inventory\s+executive|warehouse|storekeeper|supply\s+chain|procurement|materials\s+manager|dispatch\s+executive|fleet\s+manager)\b",
+    r"\b(inventory\s+manager|inventory\s+executive|warehouse|storekeeper|supply\s+chain|procurement|"
+    r"materials\s+manager|dispatch\s+executive|dispatch\s+manager|fleet\s+manager|logistics\s+executive|"
+    r"logistics\s+manager|freight|shipping\s+executive)\b",
     re.IGNORECASE,
 )
 
 MANUFACTURING_HARDWARE_REGEX = re.compile(
-    r"\b(supplier\s+quality\s+assurance|supplier\s+qa|sqa\s+engineer|mechanical\s+engineer|civil\s+engineer|site\s+engineer|welding|plant\s+supervisor|hvac)\b",
+    r"\b("
+    r"supplier\s+quality\s+assurance|supplier\s+qa|sqa\s+engineer|"
+    r"mechanical\s+engineer(ing)?|mechanical\s+design\s+engineer|"
+    r"civil\s+engineer(ing)?|civil\s+site\s+engineer|site\s+engineer|"
+    r"electrical\s+engineer(ing)?|electronics\s+engineer(ing)?|"
+    r"chemical\s+engineer(ing)?|aerospace\s+engineer(ing)?|aeronautical\s+engineer|"
+    r"structural\s+engineer(ing)?|automotive\s+engineer|biomedical\s+engineer|"
+    r"petroleum\s+engineer|marine\s+engineer|environmental\s+engineer|"
+    r"industrial\s+engineer|production\s+engineer|plant\s+engineer|"
+    r"manufacturing\s+engineer|maintenance\s+engineer|process\s+engineer|"
+    r"piping\s+engineer|hvac(\s+engineer)?|welding(\s+engineer)?|"
+    r"plant\s+supervisor|metallurg(y|ical)|mining\s+engineer"
+    r")\b",
     re.IGNORECASE,
 )
 
 SALES_RETAIL_REGEX = re.compile(
-    r"\b(inside\s+sales|sales\s+associate|sales\s+executive|sales\s+manager|telecaller|tele-sales|telesales|"
-    r"business\s+development\s+executive|bde\b|bpo\b|retail\s+associate|real\s+estate|realtor|"
-    r"store\s+manager|cashier|insurance\s+agent|front\s+desk|receptionist)\b",
+    r"\b("
+    r"inside\s+sales|field\s+sales|direct\s+sales|sales\s+associate|sales\s+executive|sales\s+manager|"
+    r"sales\s+representative|sales\s+consultant|sales\s+officer|sales\s+lead\b|"
+    r"telecaller|tele-caller|tele-sales|telesales|bde\b|bpo\b|business\s+development\s+executive|"
+    r"business\s+development\s+associate|business\s+development\s+manager|"
+    r"retail\s+associate|retail\s+executive|store\s+manager|cashier|"
+    r"real\s+estate|realtor|insurance\s+agent|front\s+desk|receptionist|"
+    r"customer\s+support\s+executive|customer\s+care|call\s+center\s+executive|"
+    r"marketing\s+executive|digital\s+marketer|seo\s+executive|content\s+writer"
+    r")\b",
     re.IGNORECASE,
 )
 
 FINANCE_REGEX = re.compile(
-    r"\b(chartered\s+accountant|teller|loan\s+officer|bookkeeper|audit\s+associate|tax\s+consultant)\b",
+    r"\b("
+    r"chartered\s+accountant|accountant\b|accounting\b|accounts\s+executive|accounts\s+manager|"
+    r"bookkeeper|bookkeeping|audit\s+associate|auditor\b|internal\s+audit|tax\s+consultant|"
+    r"teller\b|bank\s+teller|loan\s+officer|credit\s+analyst|financial\s+analyst|"
+    r"finance\s+manager|finance\s+executive|wealth\s+manager|actuary"
+    r")\b",
     re.IGNORECASE,
 )
 
-SOFTWARE_AI_REGEX = re.compile(
-    r"\b(developer|software|engineer|architect|programmer|coder|data\s+scientist|machine\s+learning|"
-    r"ai\b|artificial\s+intelligence|backend|frontend|full\s+stack|fullstack|devops|sre\b|cloud|"
-    r"python|java\b|react|fastapi|golang|c\+\+|node\.?js|sdet|test\s+automation)\b",
+HR_ADMIN_REGEX = re.compile(
+    r"\b("
+    r"hr\s+executive|hr\s+manager|hr\s+generalist|hr\s+associate|hr\s+assistant|hr\s+intern|hr\s+recruiter|"
+    r"human\s+resources|talent\s+acquisition|recruiter\b|recruitment\s+specialist|staffing\s+specialist|"
+    r"payroll\s+executive|payroll\s+specialist|office\s+administrator|office\s+assistant|"
+    r"administrative\s+assistant|admin\s+executive|executive\s+assistant"
+    r")\b",
     re.IGNORECASE,
 )
+
+QA_TESTING_REGEX = re.compile(
+    r"\b("
+    r"sdet\b|"
+    r"software\s+development\s+engineer\s+in\s+test|"
+    r"qa(\s+automation)?(\s+engineer|\s+tester|\s+analyst|\s+lead)?\b|"
+    r"quality\s+assurance(\s+engineer|\s+tester|\s+analyst|\s+automation)?\b|"
+    r"test\s+automation(\s+engineer)?\b|"
+    r"automation\s+test(er|ing)?(\s+engineer|\s+analyst)?\b|"
+    r"manual\s+test(er|ing)?(\s+engineer|\s+analyst)?\b|"
+    r"data\s+test(er|ing)?(\s+engineer|\s+analyst)?\b|"
+    r"etl\s+test(er|ing)?(\s+engineer|\s+analyst)?\b|"
+    r"software\s+test(er|ing)?(\s+engineer|\s+analyst)?\b|"
+    r"test\s+engineer\b|"
+    r"testing\s+engineer\b|"
+    r"performance\s+test(er|ing)?(\s+engineer)?\b|"
+    r"security\s+tester\b|penetration\s+tester\b"
+    r")\b",
+    re.IGNORECASE,
+)
+
+SOFTWARE_AI_DIRECT_REGEX = re.compile(
+    r"(?:"
+    r"\b(?:ai\s+engineer|artificial\s+intelligence(\s+engineer)?|"
+    r"machine\s+learning(\s+engineer)?|ml\s+engineer|mlops(\s+engineer)?|deep\s+learning(\s+engineer)?|"
+    r"data\s+scientist|data\s+science|data\s+engineer|big\s+data\s+engineer|"
+    r"nlp\s+engineer|computer\s+vision\s+engineer|llm\s+engineer|genai\s+engineer|generative\s+ai|"
+    r"python(\s+developer|\s+engineer|\s+programmer)?|"
+    r"backend(\s+developer|\s+engineer)?|back-end(\s+developer|\s+engineer)?|"
+    r"frontend(\s+developer|\s+engineer)?|front-end(\s+developer|\s+engineer)?|"
+    r"full\s*stack(\s+developer|\s+engineer)?|fullstack(\s+developer|\s+engineer)?|"
+    r"react(\s+developer|\s+engineer|\s+native|\.js)?|"
+    r"angular(\s+developer|\s+engineer)?|"
+    r"vue(\.?js)?(\s+developer|\s+engineer)?|"
+    r"software\s+engineer(ing)?|software\s+developer|software\s+programmer|software\s+architect|"
+    r"devops(\s+engineer)?|sre\b|site\s+reliability\s+engineer|"
+    r"cloud\s+engineer|cloud\s+architect|cloud\s+developer|"
+    r"platform\s+engineer|infrastructure\s+engineer|"
+    r"systems?\s+engineer|systems?\s+developer|systems?\s+programmer|"
+    r"firmware\s+engineer|embedded\s+software(\s+engineer)?|"
+    r"mobile\s+developer|ios\s+developer|android\s+developer|"
+    r"golang(\s+developer|\s+engineer)?|\bgo\s+developer|"
+    r"java(\s+developer|\s+engineer)?|"
+    r"javascript(\s+developer|\s+engineer)?|typescript(\s+developer|\s+engineer)?|"
+    r"node\.?js(\s+developer|\s+engineer)?|"
+    r"fastapi(\s+developer|\s+engineer)?|django(\s+developer|\s+engineer)?|"
+    r"solutions?\s+architect|technical\s+architect|enterprise\s+architect|"
+    r"programmer|coder|web\s+developer|application\s+developer|app\s+developer)\b|"
+    r"\bc\+\+(?!\w|\+)(\s+developer|\s+engineer)?|"
+    r"\bc#(?!\w)(\s+developer|\s+engineer)?|"
+    r"(?<!\w)\.net(\s+developer|\s+engineer)?\b|"
+    r"\bdotnet(\s+developer|\s+engineer)?\b|"
+    r"\basp\.net(\s+developer|\s+engineer)?\b"
+    r")",
+    re.IGNORECASE,
+)
+
+# Backward-compatibility alias
+SOFTWARE_AI_REGEX = SOFTWARE_AI_DIRECT_REGEX
 
 
 def classify_role_family_and_relevance(title: str, snippet: str = "") -> tuple[bool, str, str, str]:
@@ -80,6 +170,7 @@ def classify_role_family_and_relevance(title: str, snippet: str = "") -> tuple[b
     clean_title = (title or "").lower()
     clean_snippet = (snippet or "").lower()
 
+    # 1. Non-technical / unrelated career families
     if HEALTHCARE_REGEX.search(clean_title):
         return False, "NON_TECHNICAL", "HEALTHCARE", "UNRELATED_ROLE"
     if LOGISTICS_REGEX.search(clean_title):
@@ -90,52 +181,101 @@ def classify_role_family_and_relevance(title: str, snippet: str = "") -> tuple[b
         return False, "NON_TECHNICAL", "SALES_BPO", "UNRELATED_ROLE"
     if FINANCE_REGEX.search(clean_title):
         return False, "NON_TECHNICAL", "FINANCE", "UNRELATED_ROLE"
+    if HR_ADMIN_REGEX.search(clean_title):
+        return False, "NON_TECHNICAL", "HR_ADMIN", "UNRELATED_ROLE"
 
-    has_software_in_title = bool(SOFTWARE_AI_REGEX.search(clean_title))
-    has_software_in_snippet = bool(SOFTWARE_AI_REGEX.search(clean_snippet))
+    # 2. Related technical roles (QA, SDET, Testing, Verification)
+    if QA_TESTING_REGEX.search(clean_title):
+        return True, "TECHNICAL", "QA_TESTING", "RELATED_TECH"
 
-    if has_software_in_title:
+    # 3. Direct technical fit (Software, AI, Machine Learning, Web/Cloud Developers)
+    if SOFTWARE_AI_DIRECT_REGEX.search(clean_title):
         return True, "TECHNICAL", "SOFTWARE_AI", "DIRECT_FIT"
-    if has_software_in_snippet:
+
+    # 4. Snippet fallback checks (when title is generic but description specifies domain)
+    if QA_TESTING_REGEX.search(clean_snippet):
+        return True, "TECHNICAL", "QA_TESTING", "RELATED_TECH"
+    if SOFTWARE_AI_DIRECT_REGEX.search(clean_snippet):
         return True, "TECHNICAL", "SOFTWARE_AI", "RELATED_TECH"
 
     return True, "GENERAL", "OTHER", "RELATED_TECH"
 
 
-ARCHITECT_LEAD_REGEX = re.compile(
-    r"\b(architect|principal|director|chief|head\s+of|lead\s+developer|lead\s+engineer|tech\s+lead|team\s+lead|staff\s+engineer)\b",
+ARCHITECT_LEAD_TITLE_REGEX = re.compile(
+    r"\b("
+    r"architect\b|"
+    r"principal\b|"
+    r"director\b|"
+    r"chief\b|"
+    r"head\s+of\b|"
+    r"tech\s+lead\b|"
+    r"technical\s+lead\b|"
+    r"team\s+lead\b|"
+    r"engineering\s+lead\b|"
+    r"lead\s+(developer|engineer|programmer|architect|scientist|analyst)\b|"
+    r"staff\s+engineer\b"
+    r")",
     re.IGNORECASE,
 )
 
-SENIOR_REGEX = re.compile(
-    r"\b(senior|sr\.?\b|5\+?\s*years|6\+?\s*years|7\+?\s*years|8\+?\s*years|10\+?\s*years)\b",
+SENIOR_TITLE_REGEX = re.compile(
+    r"\b(senior|sr(?:\.|\b))\b",
     re.IGNORECASE,
 )
 
-ENTRY_JUNIOR_REGEX = re.compile(
-    r"\b(junior|jr\.?\b|entry\s+level|fresher|intern|internship|trainee|graduate|associate|0-1\s*year|0-2\s*years)\b",
+ENTRY_JUNIOR_TITLE_REGEX = re.compile(
+    r"\b(junior|jr(?:\.|\b)|intern\b|internship|fresher|trainee|graduate\b|entry\s+level)\b",
+    re.IGNORECASE,
+)
+
+# Backward-compatibility aliases
+ARCHITECT_LEAD_REGEX = ARCHITECT_LEAD_TITLE_REGEX
+SENIOR_REGEX = SENIOR_TITLE_REGEX
+ENTRY_JUNIOR_REGEX = ENTRY_JUNIOR_TITLE_REGEX
+
+# Snippet-only fallback patterns (used only when title contains no seniority indication)
+ARCHITECT_LEAD_SNIPPET_REGEX = re.compile(
+    r"\b(principal\s+architect|chief\s+architect|head\s+of\s+engineering|1[0-9]\+?\s*(?:years?|yrs?)(?:\s+of)?\s+experience)\b",
+    re.IGNORECASE,
+)
+
+SENIOR_SNIPPET_REGEX = re.compile(
+    r"\b([5-9]\+?\s*(?:to\s*\d+\s*)?(?:years?|yrs?)(?:\s+of)?\s+experience|senior\s+level|senior\s+role)\b",
+    re.IGNORECASE,
+)
+
+ENTRY_JUNIOR_SNIPPET_REGEX = re.compile(
+    r"\b((?:0-1|0-2|1-2)\s*(?:years?|yrs?)(?:\s+of)?\s+experience|entry\s+level|freshers?\s+(?:can\s+apply|welcome))\b",
     re.IGNORECASE,
 )
 
 
 def detect_job_seniority(title: str, snippet: str = "") -> str:
-    """Classifies job posting into ARCHITECT_LEAD, SENIOR, ENTRY_JUNIOR, or MID_LEVEL."""
+    """
+    Classifies job posting into ARCHITECT_LEAD, SENIOR, ENTRY_JUNIOR, or MID_LEVEL.
+    Priority is strictly given to job-title evidence over description keywords,
+    ensuring that junior roles are never misclassified as senior merely because
+    the description mentions senior-level experience or senior teammates.
+    """
     clean_title = (title or "").lower()
     clean_snippet = (snippet or "").lower()
-    combined = f"{clean_title} {clean_snippet}"
 
-    if ARCHITECT_LEAD_REGEX.search(clean_title):
+    # Priority 1: Direct title evidence strictly governs seniority
+    if ARCHITECT_LEAD_TITLE_REGEX.search(clean_title):
         return "ARCHITECT_LEAD"
-    if SENIOR_REGEX.search(clean_title):
+    if SENIOR_TITLE_REGEX.search(clean_title):
         return "SENIOR"
-    if ENTRY_JUNIOR_REGEX.search(clean_title):
+    if ENTRY_JUNIOR_TITLE_REGEX.search(clean_title):
         return "ENTRY_JUNIOR"
-    if ARCHITECT_LEAD_REGEX.search(combined):
+
+    # Priority 2: Only if title has no explicit seniority, examine snippet requirements
+    if ARCHITECT_LEAD_SNIPPET_REGEX.search(clean_snippet):
         return "ARCHITECT_LEAD"
-    if SENIOR_REGEX.search(combined):
+    if SENIOR_SNIPPET_REGEX.search(clean_snippet):
         return "SENIOR"
-    if ENTRY_JUNIOR_REGEX.search(combined):
+    if ENTRY_JUNIOR_SNIPPET_REGEX.search(clean_snippet):
         return "ENTRY_JUNIOR"
+
     return "MID_LEVEL"
 
 
@@ -192,6 +332,43 @@ def classify_job_relevance(title: str, snippet: str = "") -> tuple[bool, str]:
     return is_tech, role_cat
 
 
+
+
+def calculate_freshness(created_str: Optional[str]) -> tuple[Optional[int], str]:
+    """
+    Calculates job age and freshness using the source timestamp.
+    Future-dated listings are explicitly flagged.
+    """
+    if not created_str:
+        return None, "UNKNOWN"
+
+    try:
+        clean_str = created_str.replace("Z", "+00:00")
+        created_dt = datetime.fromisoformat(clean_str)
+
+        if created_dt.tzinfo is None:
+            created_dt = created_dt.replace(tzinfo=timezone.utc)
+
+        now_dt = datetime.now(timezone.utc)
+
+        if created_dt > now_dt:
+            return None, "FUTURE"
+
+        days_ago = (now_dt - created_dt).days
+
+        if days_ago <= 30:
+            return days_ago, "RECENT"
+        elif days_ago <= 90:
+            return days_ago, "MODERATE"
+        else:
+            return days_ago, "STALE"
+
+    except (ValueError, TypeError):
+        return None, "UNKNOWN"
+
+
+
+'''
 def calculate_freshness(created_str: Optional[str]) -> tuple[Optional[int], str]:
     """
     Calculates age in days and freshness category from ISO timestamp.
@@ -214,7 +391,7 @@ def calculate_freshness(created_str: Optional[str]) -> tuple[Optional[int], str]
             return days_ago, "STALE"
     except Exception:
         return None, "UNKNOWN"
-
+'''
 
 
 

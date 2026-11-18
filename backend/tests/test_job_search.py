@@ -357,3 +357,224 @@ def test_api_endpoint_with_sort_by_and_max_days_old():
     called_params = mock_get.call_args[1]["params"]
     assert called_params["sort_by"] == "date"
     assert called_params["max_days_old"] == 30
+
+
+def test_job_classification_direct_technical_fit():
+    """Verify expected direct technical software & AI engineering roles."""
+    from app.services.adzuna_client import classify_role_family_and_relevance
+
+    direct_roles = [
+        "AI Engineer",
+        "Python Developer",
+        "Backend Developer",
+        "Full Stack Developer",
+        "React Developer",
+        "Machine Learning Engineer",
+        "Software Engineer",
+    ]
+    for role in direct_roles:
+        is_tech, cat, family, rel = classify_role_family_and_relevance(role)
+        assert is_tech is True, f"{role} should be technical"
+        assert cat == "TECHNICAL", f"{role} category should be TECHNICAL"
+        assert family == "SOFTWARE_AI", f"{role} family should be SOFTWARE_AI"
+        assert rel == "DIRECT_FIT", f"{role} relevance should be DIRECT_FIT"
+
+
+def test_job_classification_related_technical():
+    """Verify QA, SDET, and testing roles are classified as related technical, not direct AI/software fit."""
+    from app.services.adzuna_client import classify_role_family_and_relevance
+
+    related_roles = [
+        "QA Automation Engineer",
+        "Data Test Engineer",
+        "SDET",
+        "Manual Tester",
+        "ETL Testing Engineer",
+    ]
+    for role in related_roles:
+        is_tech, cat, family, rel = classify_role_family_and_relevance(role)
+        assert is_tech is True, f"{role} should be technical"
+        assert cat == "TECHNICAL", f"{role} category should be TECHNICAL"
+        assert rel == "RELATED_TECH", f"{role} should be related technical, not direct fit"
+        assert rel != "DIRECT_FIT", f"{role} must not be direct AI/software fit"
+
+
+def test_job_classification_unrelated_roles():
+    """Verify non-technical and non-software engineering roles are excluded as UNRELATED_ROLE."""
+    from app.services.adzuna_client import classify_role_family_and_relevance
+
+    # Mechanical Engineer must not be a direct software fit
+    is_tech, cat, family, rel = classify_role_family_and_relevance("Mechanical Engineer")
+    assert is_tech is False
+    assert cat == "NON_TECHNICAL"
+    assert rel == "UNRELATED_ROLE"
+    assert rel != "DIRECT_FIT"
+
+    # Civil Engineer
+    is_tech, cat, family, rel = classify_role_family_and_relevance("Civil Engineer")
+    assert is_tech is False
+    assert cat == "NON_TECHNICAL"
+    assert rel == "UNRELATED_ROLE"
+    assert rel != "DIRECT_FIT"
+
+    # Sales Executive
+    is_tech, cat, family, rel = classify_role_family_and_relevance("Sales Executive")
+    assert is_tech is False
+    assert cat == "NON_TECHNICAL"
+    assert family == "SALES_BPO"
+    assert rel == "UNRELATED_ROLE"
+
+    # HR Executive
+    is_tech, cat, family, rel = classify_role_family_and_relevance("HR Executive")
+    assert is_tech is False
+    assert cat == "NON_TECHNICAL"
+    assert family == "HR_ADMIN"
+    assert rel == "UNRELATED_ROLE"
+
+    # Accountant
+    is_tech, cat, family, rel = classify_role_family_and_relevance("Accountant")
+    assert is_tech is False
+    assert cat == "NON_TECHNICAL"
+    assert family == "FINANCE"
+    assert rel == "UNRELATED_ROLE"
+
+
+def test_seniority_detection_expected_levels():
+    """Verify job seniority classifications across architect/lead, senior, junior, and mid-level."""
+    from app.services.adzuna_client import detect_job_seniority
+
+    # Architect / Lead
+    assert detect_job_seniority("Solutions Architect") == "ARCHITECT_LEAD"
+    assert detect_job_seniority("Principal Software Engineer") == "ARCHITECT_LEAD"
+    assert detect_job_seniority("Director of Engineering") == "ARCHITECT_LEAD"
+    assert detect_job_seniority("Tech Lead") == "ARCHITECT_LEAD"
+
+    # Senior / Sr.
+    assert detect_job_seniority("Senior Backend Engineer") == "SENIOR"
+    assert detect_job_seniority("Sr. Python Developer") == "SENIOR"
+    assert detect_job_seniority("Sr Python Developer") == "SENIOR"
+
+    # Junior / Intern / Fresher / Trainee / Graduate
+    assert detect_job_seniority("Junior Python Developer") == "ENTRY_JUNIOR"
+    assert detect_job_seniority("Python Intern") == "ENTRY_JUNIOR"
+    assert detect_job_seniority("Fresher Software Engineer") == "ENTRY_JUNIOR"
+    assert detect_job_seniority("Graduate Engineer Trainee") == "ENTRY_JUNIOR"
+
+    # Otherwise -> MID_LEVEL
+    assert detect_job_seniority("Python Developer") == "MID_LEVEL"
+    assert detect_job_seniority("Software Engineer") == "MID_LEVEL"
+    assert detect_job_seniority("Backend Developer") == "MID_LEVEL"
+
+
+def test_seniority_words_in_description_do_not_override_junior_title():
+    """Seniority words in unrelated description text must not override a clear junior title."""
+    from app.services.adzuna_client import detect_job_seniority
+
+    # Junior title with senior-level text and architect references in description
+    assert detect_job_seniority(
+        title="Junior Python Developer",
+        snippet="Report to the Senior Lead Architect and work alongside senior team members having 10+ years experience.",
+    ) == "ENTRY_JUNIOR"
+
+    # Intern title with senior experience keywords in description
+    assert detect_job_seniority(
+        title="Python Intern",
+        snippet="Requires 5+ years experience mentoring under our senior engineering staff.",
+    ) == "ENTRY_JUNIOR"
+
+    # Graduate trainee title with senior keywords in description
+    assert detect_job_seniority(
+        title="Graduate Software Engineer",
+        snippet="Learn scalable systems design from senior staff architects with 8+ years experience.",
+    ) == "ENTRY_JUNIOR"
+
+
+def test_regex_correctness_tech_stacks_and_escaping():
+    """Verify C++, Node.js, C#, .NET, and abbreviation regex escaping and matching."""
+    from app.services.adzuna_client import classify_role_family_and_relevance
+
+    # C++ escaping (word boundaries and + quantifier escaping)
+    is_tech, cat, family, rel = classify_role_family_and_relevance("C++ Developer")
+    assert is_tech is True
+    assert rel == "DIRECT_FIT"
+
+    is_tech, cat, family, rel = classify_role_family_and_relevance("Senior C++ Software Engineer")
+    assert is_tech is True
+    assert rel == "DIRECT_FIT"
+
+    # Node.js
+    is_tech, cat, family, rel = classify_role_family_and_relevance("Node.js Developer")
+    assert is_tech is True
+    assert rel == "DIRECT_FIT"
+
+    is_tech, cat, family, rel = classify_role_family_and_relevance("Nodejs Developer")
+    assert is_tech is True
+    assert rel == "DIRECT_FIT"
+
+    # C# and .NET
+    is_tech, cat, family, rel = classify_role_family_and_relevance("C# Developer")
+    assert is_tech is True
+    assert rel == "DIRECT_FIT"
+
+    is_tech, cat, family, rel = classify_role_family_and_relevance(".NET Developer")
+    assert is_tech is True
+    assert rel == "DIRECT_FIT"
+
+    is_tech, cat, family, rel = classify_role_family_and_relevance("ASP.NET Developer")
+    assert is_tech is True
+    assert rel == "DIRECT_FIT"
+
+
+def test_additional_verification_cases():
+    """Verify specific edge cases requested by the user:
+    1. 'Junior Software Engineer with 5+ years experience' -> ENTRY_JUNIOR (title priority).
+    2. 'Software Engineer II' -> MID_LEVEL (not automatically SENIOR).
+    3. 'QA Automation Engineer' -> RELATED_TECH (not DIRECT_FIT).
+    4. 'Mechanical Engineer' with Python description -> UNRELATED_ROLE (not DIRECT_FIT).
+    5. 'Data Engineer' -> DIRECT_FIT (SOFTWARE_AI).
+    6. 'Cloud Engineer' -> DIRECT_FIT (SOFTWARE_AI).
+    """
+    from app.services.adzuna_client import classify_role_family_and_relevance, detect_job_seniority
+
+    # 1. 'Junior Software Engineer with 5+ years experience' remains ENTRY_JUNIOR based on title priority
+    assert detect_job_seniority("Junior Software Engineer with 5+ years experience") == "ENTRY_JUNIOR"
+    assert detect_job_seniority(
+        title="Junior Software Engineer",
+        snippet="Candidate should have 5+ years experience in software engineering.",
+    ) == "ENTRY_JUNIOR"
+
+    # 2. 'Software Engineer II' should not automatically become SENIOR
+    seniority_se2 = detect_job_seniority("Software Engineer II")
+    assert seniority_se2 != "SENIOR"
+    assert seniority_se2 == "MID_LEVEL"
+
+    # 3. 'QA Automation Engineer' should not receive DIRECT_FIT
+    is_tech_qa, cat_qa, fam_qa, rel_qa = classify_role_family_and_relevance("QA Automation Engineer")
+    assert is_tech_qa is True
+    assert rel_qa != "DIRECT_FIT"
+    assert rel_qa == "RELATED_TECH"
+    assert fam_qa == "QA_TESTING"
+
+    # 4. 'Mechanical Engineer' should not receive DIRECT_FIT even when description mentions Python
+    is_tech_mech, cat_mech, fam_mech, rel_mech = classify_role_family_and_relevance(
+        title="Mechanical Engineer",
+        snippet="Work with thermodynamic simulation, HVAC CAD modeling, and Python scripting.",
+    )
+    assert rel_mech != "DIRECT_FIT"
+    assert rel_mech == "UNRELATED_ROLE"
+    assert is_tech_mech is False
+    assert fam_mech == "MANUFACTURING_HARDWARE"
+
+    # 5. 'Data Engineer' should remain a direct technical fit
+    is_tech_data, cat_data, fam_data, rel_data = classify_role_family_and_relevance("Data Engineer")
+    assert is_tech_data is True
+    assert rel_data == "DIRECT_FIT"
+    assert fam_data == "SOFTWARE_AI"
+
+    # 6. 'Cloud Engineer' should remain a direct technical fit
+    is_tech_cloud, cat_cloud, fam_cloud, rel_cloud = classify_role_family_and_relevance("Cloud Engineer")
+    assert is_tech_cloud is True
+    assert rel_data == "DIRECT_FIT"
+    assert fam_cloud == "SOFTWARE_AI"
+
+

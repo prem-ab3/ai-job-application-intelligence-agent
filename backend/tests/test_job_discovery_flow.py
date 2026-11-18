@@ -1,6 +1,7 @@
 """End-to-end integration and regression tests for job discovery, relevance gating, and freshness."""
 
 import json
+from datetime import datetime, timezone, timedelta
 from pathlib import Path
 import sys
 from unittest.mock import AsyncMock, MagicMock, patch
@@ -36,7 +37,7 @@ def test_resume_derived_search_without_manual_role_input():
                 "company": {"display_name": "AI Innovations"},
                 "location": {"display_name": "Bengaluru, Karnataka"},
                 "description": "Looking for a Machine Learning Engineer with strong Python and PyTorch skills.",
-                "created": "2026-10-10T12:00:00Z",
+                "created": (datetime.now(timezone.utc) - timedelta(days=2)).isoformat(),
                 "redirect_url": "https://adzuna.example.com/job/1001",
             }
         ],
@@ -178,7 +179,7 @@ def test_freshness_filtering_and_honest_availability():
     assert cat == "STALE"
     assert days is not None and days > 500
 
-    days_recent, cat_recent = calculate_freshness("2026-10-12T00:00:00Z")
+    days_recent, cat_recent = calculate_freshness((datetime.now(timezone.utc) - timedelta(days=3)).isoformat())
     assert cat_recent == "RECENT"
 
     # Verify search result items always retain honest unverified status
